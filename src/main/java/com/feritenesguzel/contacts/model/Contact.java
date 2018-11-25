@@ -1,17 +1,18 @@
 package com.feritenesguzel.contacts.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
+import java.io.*;
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
-
+/**
+ * Phone entity related to 'Contact' obj.(Many to one)
+ */
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")//added because json serialazition ignores infinite loop in objects.
 @Table(name = "contact")
-public class Contact {
+public class Contact implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -29,20 +30,20 @@ public class Contact {
     private String workInfo;
 
     @OneToMany(
+            fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "contact"
     )
-    @JsonIgnoreProperties("contact")
     private Set<Phone> phoneList;
 
     @OneToMany(
+            fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "contact"
     )
-    @JsonIgnoreProperties("contact")
-    private Set<Adress> addressList;
+    private Set<Address> addressList;
 
     public long getId() {
         return id;
@@ -60,11 +61,11 @@ public class Contact {
         this.name = name;
     }
 
-    public String getSurName() {
+    public String getSurname() {
         return surname;
     }
 
-    public void setSurName(String surName) {
+    public void setSurname(String surName) {
         this.surname = surName;
     }
 
@@ -92,11 +93,11 @@ public class Contact {
         this.phoneList = phoneList;
     }
 
-    public Set<Adress> getAddressList() {
+    public Set<Address> getAddressList() {
         return addressList;
     }
 
-    public void setAddressList(Set<Adress> adressList) {
+    public void setAddressList(Set<Address> adressList) {
         this.addressList = adressList;
     }
 
@@ -104,4 +105,5 @@ public class Contact {
     public String toString() {
         return "Contact [id=" + id + ", data=" + name + "]";
     }
+
 }

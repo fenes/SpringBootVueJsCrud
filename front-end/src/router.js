@@ -1,38 +1,35 @@
 import Vue from "vue";
 import Router from "vue-router";
-import contactList from "./components/ContactList.vue";
+import ContactList from "./components/ContactList.vue";
 import AddContact from "./components/AddContact.vue";
 import SearchContact from "./components/SearchContact.vue";
-import contact from "./components/Contact.vue";
+import ContactDetail from "./components/Contact.vue";
 
 Vue.use(Router);
 
 export default new Router({
-  mode: "history",
-  routes: [
-    {
-      path: "/",
-      name: "contact",
-      alias: "/contact",
-      component: contactList,
-      children: [
+    mode: "history",
+    routes: [
         {
-          path: "/Contact/:id",
-          name: "contact-details",
-          component: contact,
-          props: true
+            path: "/",
+            name: "contact",
+            alias: "/contact",
+            component: ContactList,
+        },
+        {
+            path: "/contact/:id",
+            name: "ContactDetail",
+            component: ContactDetail
+        },
+        {
+            path: "/add",
+            name: "add",
+            component: AddContact
+        },
+        {
+            path: "/search",
+            name: "search",
+            component: SearchContact
         }
-      ]
-    },
-    {
-      path: "/add",
-      name: "add",
-      component: AddContact
-    },
-    {
-      path: "/search",
-      name: "search",
-      component: SearchContact
-    }
-  ]
+    ]
 });

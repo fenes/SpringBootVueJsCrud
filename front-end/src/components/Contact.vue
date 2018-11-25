@@ -1,90 +1,180 @@
 <template>
-  <div v-if="this.contact">
-    <h4>contact</h4>
-    <div>
-      <label>Name: </label> 
-            <input type="text" class="form-control" id="name" required v-model="contact.name" name="name">
+    <div class="submitform">
+        <div v-if="!submitted">
+            <h3>Contact Detail / Edit</h3>
+            <div class="card">
+                <div class="card-header">
+                    Contact Detail (Cached by Redis)
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input placeholder="Name" type="text" class="form-control" id="name" required
+                               v-model="contact.name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Surname</label>
+                        <input placeholder="Surname" type="text" class="form-control" id="surname" required
+                               v-model="contact.surname"
+                               name="surname">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Work Info</label>
+                        <input placeholder="Work Info" type="text" class="form-control" id="workInfo" required
+                               v-model="contact.workInfo"
+                               name="workInfo">
+                    </div>
+                    <div class="form-group">
+                        <label for="surname">Birthday</label>
+                        <datepicker required placeholder="Select Date" v-model="contact.birthday"></datepicker>
+                    </div>
+                    <div class="table-responsive" v-if="this.contact.phoneList.length != 0">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">
+                                    Phone Type
+                                </th>
+                                <th>
+                                    Phone Number
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="phone in this.contact.phoneList" v-bind:key="phone.id">
+                                <td><input placeholder="Phone Type" v-model="phone.key" type="text"></td>
+                                <td>
+                                    <the-mask placeholder="Phone Number" mask="(###) ### ## ##" v-model="phone.value"/>
+                                </td>
+                                <td>
+                                    <a href="#" class="icon">
+                                        <i v-on:click="deletePhoneRow(product)" class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-secondary" @click="addPhoneRow"> Add Phone</button>
+                    <br><br>
+                    <div class="table-responsive" v-if="this.contact.addressList.length != 0">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">
+                                    Address Type
+                                </th>
+                                <th>
+                                    Address Value
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="address in this.contact.addressList" v-bind:key="address.id">
+                                <td><input placeholder="Address Type" v-model="address.key" type="text"></td>
+                                <td>
+                                    <textarea placeholder="Address" v-model="address.value" name="addressValue"
+                                              cols="30" rows="3"></textarea>
+                                </td>
+                                <td>
+                                    <a href="#" class="icon">
+                                        <i v-on:click="deleteAddressRow(address)" class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-secondary" @click="addAddressRow"> Add Address</button>
+                    <br><br>
+                    <router-link :to="'/'" class="btn btn-primary"> Back</router-link>
+                    <button v-on:click="updateContact" class="btn btn-success"> Update</button>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <h3>You submitted successfully!</h3>
+            <router-link :to="'/'" class="btn btn-success"> Go List Page</router-link>
+        </div>
     </div>
-    <div>
-      <label>Surname: </label>
-            <input type="text" class="form-control" id="surname" required v-model="contact.surName" name="surname">
-    </div>
-    <div>
-      <label>Work Info: </label> 
-      <input type="text" class="form-control" id="workInfo" required v-model="contact.workInfo" name="workInfo">
-    </div>
-  
-    <div>
-      <label>birthday </label> 
-      <datepicker id="birthday" required placeholder="Select Date" v-model="contact.birthday"></datepicker>
-    </div>
-    <li v-for="(input, index) in this.contact.phoneList">
-        <input type="text" v-model="input.key"> - {{ input.key }}  
-        <input type="text" v-model="input.value"> - {{ input.value }}
-        <button @click="deleteRow(index)">Delete</button>
-      </li>
-      
-    <button @click="addRow">Add row</button>
-    <button 
-      v-on:click="updateContact()"
-      class="button is-small btn-primary">Update</button>
-  
-    <button class="button is-small btn-danger" v-on:click="deleteContact()">Delete</button>
-  </div>
-  <div v-else>
-    <br/>
-    <p>Please click on a contact...</p>
-  </div>
 </template>
-
 <script>
-import http from "../http-common";
+    import http from "../http-common";
 
-import Datepicker from 'vuejs-datepicker';
+    import Datepicker from 'vuejs-datepicker';
 
-export default {
-  name: "contact",
-  props: ["contact"],
-  components: {
-    Datepicker
-  },
-  methods: {
-    addRow() {
-      this.contact.phoneList.push({
-        key: '',
-        value: ''
-      })
-    },
-    deleteRow(index) {
-      this.contact.phoneList.splice(index,1)
-    },
-    /* eslint-disable no-console */
-    updateContact() {
-      var data = this.contact;
 
-      http
-        .put("/contact", data)
-        .then(response => {
-          //this.contact.active = response.data.active;
-          console.log(response.data);
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    },
-    deleteContact() {
-      http
-        .delete("/contact/" + this.contact.id)
-        .then(response => {
-          console.log(response.data);
-          this.$emit("refreshData");
-          this.$router.push('/');
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    }
-    /* eslint-enable no-console */
-  }
-};
+    export default {
+        name: "add-contact",
+        components: {
+            Datepicker
+        },
+        data() {
+            return {
+                contact: {
+                    id: 0,
+                    name: "",
+                    surname: "",
+                    workInfo: "",
+                    birthday: "",
+                    phoneList: [],
+                    addressList: []
+                },
+                submitted: false
+            };
+        },
+        beforeCreate() {
+            http
+                .get("/contact/" + this.$route.params.id)
+                .then(response => {
+                    this.contact = response.data; // JSON are parsed automatically.
+                })
+        },
+        methods: {
+            addPhoneRow() {
+                this.contact.phoneList.push({
+                    key: '',
+                    value: ''
+                })
+            },
+            deletePhoneRow(phone) {
+                this.contact.phoneList.splice(this.contact.phoneList.indexOf(phone), 1)
+            },
+            addAddressRow() {
+                this.contact.addressList.push({
+                    key: '',
+                    value: ''
+                })
+            },
+            deleteAddressRow(address) {
+                this.contact.addressList.splice(this.contact.addressList.indexOf(address), 1)
+            },
+            /* eslint-disable no-console */
+            updateContact() {
+                var data = this.contact;
+
+                http
+                    .put("/contact", data)
+                    .then(response => {
+                        this.submitted = true;
+                        console.log(response.data);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    });
+            },
+            newcontact() {
+                this.submitted = false;
+                this.contact = {};
+            }
+        }
+    };
 </script>
+
+<style scoped>
+    h3 {
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+</style>

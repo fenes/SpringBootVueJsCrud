@@ -1,6 +1,8 @@
 {
   "name": "vue-springboot",
   "version": "0.1.0",
+  "description": "A Vue.js simple CRUD app with SpringBoot and Postgre",
+  "author": "Ferit Enes Güzel <fenesguzel@gmail.com>",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,8 +11,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "moment": "^2.22.2",
+    "numeral": "^2.0.6",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
+    "vue-the-mask": "^0.11.1",
     "vuejs-datepicker": "^1.5.4"
   },
   "devDependencies": {

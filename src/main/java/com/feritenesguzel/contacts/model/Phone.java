@@ -1,13 +1,17 @@
 package com.feritenesguzel.contacts.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
-
+import java.io.Serializable;
+/**
+ * Phone entity related to 'Contact' obj.(Many to one)
+ */
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")//added because json serialazition ignores infinite loop in objects.
 @Table(name = "phone")
-public class Phone {
+public class Phone implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -18,9 +22,8 @@ public class Phone {
     @Column(name = "Value")
     private String value;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "contact_id", nullable = false)
-    @JsonIgnoreProperties("phoneList")
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "Contact_id", referencedColumnName = "id")
     private Contact contact;
 
     public long getId() {
