@@ -9,6 +9,9 @@ import java.io.Serializable;
 /**
  * Address entity related to 'Contact' obj.(Many to one)
  */
+
+
+
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")//added because json serialazition ignores infinite loop in objects.
 @Table(name = "address")

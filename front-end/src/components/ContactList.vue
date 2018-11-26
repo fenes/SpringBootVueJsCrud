@@ -5,7 +5,7 @@
                 Contact List
             </div>
             <div class="card-body">
-                <div class="table">
+                <div class="table" v-if="contact.length > 0">
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -77,6 +77,9 @@
                         </tbody>
                     </table>
                 </div>
+                <div v-else>
+                    <h4>List is empty!</h4>
+                </div>
             </div>
         </div>
 
@@ -130,6 +133,10 @@
                     .get("/contact")
                     .then(response => {
                         this.contact = response.data; // JSON are parsed automatically.
+                    }, (response) => {
+                        if(response){
+                            this.contact=[];
+                            }
                     })
                     .catch(e => {
                         console.log(e);

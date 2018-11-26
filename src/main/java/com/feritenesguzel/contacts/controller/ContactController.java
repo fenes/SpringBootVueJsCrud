@@ -2,6 +2,7 @@ package com.feritenesguzel.contacts.controller;
 
 import java.util.List;
 
+import com.feritenesguzel.contacts.exceptionhandler.EntityNotFoundException;
 import com.feritenesguzel.contacts.model.Contact;
 import com.feritenesguzel.contacts.service.IContactService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,34 +20,45 @@ public class ContactController {
 
     //endpoints;
     @GetMapping("/contact")
-    public ResponseEntity<List<Contact>> getAllContact() {
-        return new ResponseEntity<>(contactService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<Contact>> getAllContact() throws EntityNotFoundException {
+        List<Contact> result = contactService.getAll();
+        HttpStatus status = (result == null || result.size() == 0) ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+        return new ResponseEntity<>(result, status);
     }
 
     @PostMapping("/contact")
-    public ResponseEntity<Contact> addContact(@RequestBody Contact contact) {
-        return new ResponseEntity<>(contactService.addContact(contact), HttpStatus.OK);
+    public ResponseEntity<Boolean> addContact(@RequestBody Contact contact) {
+        Boolean result = contactService.addContact(contact);
+        HttpStatus status = result ? HttpStatus.CREATED : HttpStatus.EXPECTATION_FAILED;
+        return new ResponseEntity<>(result, status);
     }
 
     @DeleteMapping("/contact/{id}")
     public ResponseEntity<Boolean> deleteContact(@PathVariable Long id) {
-        return new ResponseEntity<>(contactService.deleteContact(id), HttpStatus.OK);
+        Boolean result = contactService.deleteContact(id);
+        HttpStatus status = result ? HttpStatus.OK : HttpStatus.EXPECTATION_FAILED;
+        return new ResponseEntity<>(result, status);
     }
 
     @GetMapping("/contact/{id}")
-    public ResponseEntity<Contact> getContact(@PathVariable Long id) {
-        return new ResponseEntity<>(contactService.getContact(id), HttpStatus.OK);
+    public ResponseEntity<Contact> getContact(@PathVariable Long id) throws EntityNotFoundException {
+        Contact result = contactService.getContact(id);
+        HttpStatus status = (result != null) ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(result, status);
     }
 
     @PutMapping("/contact")
-    public ResponseEntity<Contact> updateContact(@RequestBody Contact contact) {
-        return new ResponseEntity<>(contactService.updateContact(contact), HttpStatus.OK);
-
+    public ResponseEntity<Boolean> updateContact(@RequestBody Contact contact) {
+        Boolean result = contactService.updateContact(contact) != null;
+        HttpStatus status = result ? HttpStatus.OK : HttpStatus.EXPECTATION_FAILED;
+        return new ResponseEntity<>(result, status);
     }
 
     @GetMapping("/contact/search/{param}")
-    public ResponseEntity<List<Contact>> searchContact(@PathVariable String param) {
-        return new ResponseEntity<>(contactService.searchContact(param), HttpStatus.OK);
+    public ResponseEntity<List<Contact>> searchContact(@PathVariable String param) throws EntityNotFoundException {
+        List<Contact> result = contactService.searchContact(param);
+        HttpStatus status = (result == null || result.size() == 0) ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+        return new ResponseEntity<>(result, status);
     }
 
 }

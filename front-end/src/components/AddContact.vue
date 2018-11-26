@@ -46,7 +46,6 @@
                                 <td>
                                     <the-mask placeholder="Write Phone Number" mask="(###) ### ## ##"
                                               v-model="phone.value"/>
-
                                 <td>
                                     <a href="#" class="icon">
                                         <i v-on:click="deletePhoneRow(product)" class="fa fa-trash"></i>
@@ -89,7 +88,7 @@
                     <button class="btn btn-secondary" @click="addAddressRow"> Add Address</button>
                     <br><br>
                     <router-link :to="'/'" class="btn btn-primary"> Back</router-link>
-                    <button v-on:click="savecontact" class="btn btn-success"> Submit</button>
+                    <button v-on:click="saveContact" class="btn btn-success"> Submit</button>
                 </div>
             </div>
         </div>
@@ -142,22 +141,13 @@
             deleteAddressRow(address) {
                 this.contact.addressList.splice(this.contact.addressList.indexOf(address), 1)
             },
-            savecontact() {
-
+            saveContact() {
                 http
                     .post("/contact", this.contact)
                     .then(response => {
                         this.contact.id = response.data.id;
-                    })
-                    .catch(e => {
-                        console.log(e);
+                        this.submitted = true;
                     });
-
-                this.submitted = true;
-            },
-            newcontact() {
-                this.submitted = false;
-                this.contact = {};
             }
         }
     };

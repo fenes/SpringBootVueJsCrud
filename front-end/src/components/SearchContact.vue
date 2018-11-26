@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <button v-on:click="searchcontact" class="btn btn-success">Search</button>
+                    <button v-on:click="SearchContact" class="btn btn-success">Search</button>
                 </div>
                 <br><br>
                 <div class="Contacts">
@@ -62,7 +62,7 @@
                                         </td>
                                         <td>
                                             <p v-for="phone in contact.phoneList" v-bind:key="phone.id">
-                                                {{phone.key}} - {{phone.value | formatNumber}} <br>
+                                                {{phone.key}} - {{phone.value}} <br>
                                             </p>
                                         </td>
                                         <td>
@@ -109,15 +109,16 @@
                     return moment(String(value)).format('DD/MM/YYYY')
                 }
             },
-            searchcontact() {
+            SearchContact: function () {
                 http
                     .get("/contact/search/" + this.searchParam)
                     .then(response => {
                         this.contactList = response.data;
-                        this.emptyParam = this.contactList.length === 0 ? 'Result is empty.' : '';
-                    })
-                    .catch(e => {
-                        console.log(e);
+                    }, (response) => {
+                        if (response){
+                            this.contactList = [];
+                            this.emptyParam = 'Search result is empty.';
+                        }
                     });
             }
         }

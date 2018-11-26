@@ -1,5 +1,6 @@
 package com.feritenesguzel.contacts.service;
 
+import com.feritenesguzel.contacts.exceptionhandler.EntityNotFoundException;
 import com.feritenesguzel.contacts.model.Address;
 import com.feritenesguzel.contacts.model.Contact;
 import com.feritenesguzel.contacts.model.Phone;
@@ -21,7 +22,7 @@ public class ContactService implements IContactService {
     ContactRepository contactsRepository;
 
     @Override
-    public List<Contact> getAll() {
+    public List<Contact> getAll() throws EntityNotFoundException {
         try {
             return contactsRepository.findAll();
         } catch (Exception e) {
@@ -31,22 +32,24 @@ public class ContactService implements IContactService {
 
     @Cacheable("Contact")//redis add
     @Override
-    public Contact getContact(long id) {
-        try {
-            return contactsRepository.findById(id).orElse(null);
-        } catch (Exception e) {
-            return null;
-        }
+    public Contact getContact(long id) throws EntityNotFoundException {
+        return contactsRepository.findById(id).orElse(null);
+
     }
 
     @Override
-    public Contact addContact(Contact contact) {
+    public List<Contact> getContactByName(String name) throws EntityNotFoundException {
+        return contactsRepository.getContactsByName(name);
+    }
+
+    @Override
+    public Boolean addContact(Contact contact) {
         try {
-            Contact contactDb = contactsRepository.save(FillAddressAndPhoneListSContactObj(contact));
-            logger.debug("Saved person [{}]", contactDb.getId());
-            return contactDb;
+            contactsRepository.save(FillAddressAndPhoneListSContactObj(contact));
+            logger.debug("Saved person [{}]", contact.getId());
+            return true;
         } catch (Exception e) {
-            return null;
+            return false;
         }
     }
 
@@ -54,9 +57,9 @@ public class ContactService implements IContactService {
     @Override
     public Contact updateContact(Contact contact) {
         try {
-            Contact contactDb = contactsRepository.save(FillAddressAndPhoneListSContactObj(contact));
-            logger.debug("Updated person [{}]", contactDb.getId());
-            return contactDb;
+            contactsRepository.save(FillAddressAndPhoneListSContactObj(contact));
+            logger.debug("Updated person [{}]", contact.getId());
+            return contact  ;
         } catch (Exception e) {
             return null;
         }
@@ -74,7 +77,7 @@ public class ContactService implements IContactService {
     }
 
     @Override
-    public List<Contact> searchContact(String param) {
+    public List<Contact> searchContact(String param) throws EntityNotFoundException {
         try {
             return contactsRepository.search(param.toLowerCase());
         } catch (Exception e) {
